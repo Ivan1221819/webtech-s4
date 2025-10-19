@@ -10,4 +10,6 @@ public class WebtechApplication {
 		SpringApplication.run(WebtechApplication.class, args);
 	}
 
+
+
 }
