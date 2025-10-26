@@ -4,8 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c41f2d42-2a79-47d0-9419-f13998bd8b6c" name="Changes" comment="M1&#10;Gruppe: Ivan Epp (s0590964)&#10;Thema: Rezept Browser">
-      <change beforePath="$PROJECT_DIR$/webtech/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/webtech/build.gradle.kts" afterDir="false" />
+    <list default="true" id="c41f2d42-2a79-47d0-9419-f13998bd8b6c" name="Changes" comment="kleine änderung eines Fehlers">
+      <change beforePath="$PROJECT_DIR$/.idea/gradle.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/gradle.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/webtech/src/main/java/webtech_semester_4/webtech/persistence/Recipe.java" beforeDir="false" afterPath="$PROJECT_DIR$/webtech/src/main/java/webtech_semester_4/webtech/persistence/Recipe.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -74,30 +77,30 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "DefaultHtmlFileTemplate": "HTML File",
-    "Gradle.Build webtech.executor": "Run",
-    "Gradle.WebtechApplicationTests.contextLoads.executor": "Run",
-    "RequestMappingsPanelOrder0": "0",
-    "RequestMappingsPanelOrder1": "1",
-    "RequestMappingsPanelWidth0": "75",
-    "RequestMappingsPanelWidth1": "75",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "Spring Boot.WebtechApplication.executor": "Run",
-    "git-widget-placeholder": "main",
-    "ignore.virus.scanning.warn.message": "true",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "A:/UNI/webtech-s4/webtech/build.gradle.kts",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "preferences.pluginManager",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
+    &quot;Gradle.Build webtech.executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.WebtechApplicationTests.contextLoads.executor&quot;: &quot;Run&quot;,
+    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
+    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
+    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
+    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;Spring Boot.WebtechApplication.executor&quot;: &quot;Run&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;A:/UNI/webtech-s4/webtech/build.gradle.kts&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="A:\UNI\webtech-s4\webtech" />
@@ -168,6 +171,9 @@
       <workItem from="1760631049459" duration="5756000" />
       <workItem from="1760871732441" duration="127000" />
       <workItem from="1760871867508" duration="2992000" />
+      <workItem from="1761040351141" duration="71000" />
+      <workItem from="1761040451127" duration="2288000" />
+      <workItem from="1761477120239" duration="1572000" />
     </task>
     <task id="LOCAL-00001" summary="M1&#10;Gruppe: Ivan Epp (s0590964)&#10;Thema: Rezept Browser">
       <option name="closed" value="true" />
@@ -177,7 +183,15 @@
       <option name="project" value="LOCAL" />
       <updated>1760874751365</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="kleine änderung eines Fehlers">
+      <option name="closed" value="true" />
+      <created>1761040397632</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1761040397632</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -185,7 +199,8 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="M1&#10;Gruppe: Ivan Epp (s0590964)&#10;Thema: Rezept Browser" />
-    <option name="LAST_COMMIT_MESSAGE" value="M1&#10;Gruppe: Ivan Epp (s0590964)&#10;Thema: Rezept Browser" />
+    <MESSAGE value="kleine änderung eines Fehlers" />
+    <option name="LAST_COMMIT_MESSAGE" value="kleine änderung eines Fehlers" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

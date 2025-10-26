@@ -31,7 +31,7 @@ public class Recipe {
     @Column(name = "image_URL")
     private String image_Url;
 
-    public Recipe() {}
+
 
 
 
