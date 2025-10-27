@@ -64,7 +64,12 @@
     <!-- Detailmodal -->
     <div v-if="selectedMeal" class="modal" @click.self="selectedMeal = null">
       <div class="modal-content">
-        <img v-if="selectedMeal.strMealThumb" :src="selectedMeal.strMealThumb" :alt="selectedMeal.strMeal" class="modal-poster" />
+        <img
+          v-if="selectedMeal.strMealThumb"
+          :src="selectedMeal.strMealThumb"
+          :alt="selectedMeal.strMeal"
+          class="modal-poster"
+        />
         <div class="modal-info">
           <button class="back" @click="selectedMeal = null">← Zur Suche</button>
           <h2>{{ selectedMeal.strMeal }}</h2>
@@ -87,98 +92,126 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { useWishlist } from '@/lib/merkliste';
+
 const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:8080';
 
 export default {
   name: 'RecipeSearch',
+
+  // Wishlist-Composable in Options-API verwenden
+  setup() {
+    const { items, add, remove, clear, has } = useWishlist();
+    return {
+      wishlist: items,           // Ref-Liste aus der Composable
+      addToWishlist: add,
+      removeFromWishlist: remove,
+      clearWishlist: clear,
+      hasInWishlist: has,
+    };
+  },
+
   data() {
     return {
       query: '',
-      results: [],
+      results: [] as any[],
       loading: false,
       error: '',
-      selectedMeal: null,
+      selectedMeal: null as any,
       showMerkliste: false,
-      savedMeals: JSON.parse(localStorage.getItem('wishlist-meals') || '[]'),
       darkMode: true,
-      _debounceTimer: null
-    }
+      _debounceTimer: null as any,
+    };
   },
+
+  computed: {
+    // Anzeige-Adapter: Wishlist-Items -> TheMealDB-Felder im Template
+    savedMeals(): any[] {
+      return this.wishlist.map((m: any) => ({
+        idMeal: m.idMeal,
+        strMeal: m.name,
+        strMealThumb: m.thumbUrl,
+      }));
+    },
+    ingredients(): string[] {
+      if (!this.selectedMeal) return [];
+      const m = this.selectedMeal as any;
+      const list: string[] = [];
+      for (let i = 1; i <= 20; i++) {
+        const ing = m[`strIngredient${i}`];
+        const meas = m[`strMeasure${i}`];
+        if (ing && ing.trim()) list.push(`${ing}${meas ? ` (${meas})` : ''}`);
+      }
+      return list;
+    },
+  },
+
   methods: {
     /* ---- UI ---- */
-    toggleDarkMode() { this.darkMode = !this.darkMode },
-    toggleMerkliste() { this.showMerkliste = !this.showMerkliste },
-    clearSearch() { this.query = ''; this.results = []; this.$refs.searchInput?.focus() },
+    toggleDarkMode() { this.darkMode = !this.darkMode; },
+    toggleMerkliste() { this.showMerkliste = !this.showMerkliste; },
+    clearSearch() {
+      this.query = '';
+      this.results = [];
+      (this.$refs as any).searchInput?.focus();
+    },
 
     /* ---- Suche (mit Debounce) ---- */
     onQueryInput() {
-      clearTimeout(this._debounceTimer)
-      if (this.query.trim().length < 2) { this.results = []; return }
-      this._debounceTimer = setTimeout(this.runSearch, 250)
+      clearTimeout(this._debounceTimer);
+      if (this.query.trim().length < 2) { this.results = []; return; }
+      this._debounceTimer = setTimeout(this.runSearch, 250);
     },
     async runSearch() {
-      const q = this.query.trim()
-      if (q.length < 2) return
-      this.loading = true; this.error = ''; this.showMerkliste = false
+      const q = this.query.trim();
+      if (q.length < 2) return;
+      this.loading = true; this.error = ''; this.showMerkliste = false;
       try {
-        const res = await fetch(`${API_BASE}/api/meals?q=${encodeURIComponent(q)}`)
-        if (!res.ok) throw new Error(`HTTP ${res.status}`)
-        const data = await res.json()
-        this.results = data.meals ?? []   // TheMealDB gibt null bei 0 Treffern
+        const res = await fetch(`${API_BASE}/api/meals?q=${encodeURIComponent(q)}`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        this.results = data.meals ?? []; // TheMealDB gibt null bei 0 Treffern
       } catch (e) {
-        this.error = 'Suche fehlgeschlagen'
-        this.results = []
-        console.error(e)
+        this.error = 'Suche fehlgeschlagen';
+        this.results = [];
+        console.error(e);
       } finally {
-        this.loading = false
+        this.loading = false;
       }
     },
 
     /* ---- Detail laden/öffnen ---- */
-    async openMeal(meal) {
+    async openMeal(meal: any) {
       try {
         if (!meal.strInstructions) {
-          const res = await fetch(`${API_BASE}/api/meals/${meal.idMeal}`)
-          const data = await res.json()
-          this.selectedMeal = (data.meals && data.meals[0]) || meal
+          const res = await fetch(`${API_BASE}/api/meals/${meal.idMeal}`);
+          const data = await res.json();
+          this.selectedMeal = (data.meals && data.meals[0]) || meal;
         } else {
-          this.selectedMeal = meal
+          this.selectedMeal = meal;
         }
       } catch (e) {
-        console.error(e)
-        this.selectedMeal = meal
+        console.error(e);
+        this.selectedMeal = meal;
       }
     },
 
-    /* ---- Merkliste (LocalStorage) ---- */
-    isSaved(id) { return this.savedMeals.some(m => m.idMeal === id) },
-    addToList(meal) {
-      if (!this.isSaved(meal.idMeal)) {
-        this.savedMeals.push({ idMeal: meal.idMeal, strMeal: meal.strMeal, strMealThumb: meal.strMealThumb })
-        localStorage.setItem('wishlist-meals', JSON.stringify(this.savedMeals))
-      }
-      alert('Rezept gemerkt.')
+    /* ---- Merkliste via Composable ---- */
+    isSaved(id: string) { return this.hasInWishlist(id); },
+    addToList(meal: any) {
+      this.addToWishlist({
+        idMeal: meal.idMeal,
+        strMeal: meal.strMeal,
+        strMealThumb: meal.strMealThumb,
+      });
+      alert('Rezept gemerkt.');
     },
-    removeFromList(id) {
-      this.savedMeals = this.savedMeals.filter(m => m.idMeal !== id)
-      localStorage.setItem('wishlist-meals', JSON.stringify(this.savedMeals))
-    }
+    removeFromList(id: string) {
+      this.removeFromWishlist(id);
+    },
   },
-  computed: {
-    ingredients() {
-      if (!this.selectedMeal) return []
-      const m = this.selectedMeal
-      const list = []
-      for (let i = 1; i <= 20; i++) {
-        const ing = m[`strIngredient${i}`]
-        const meas = m[`strMeasure${i}`]
-        if (ing && ing.trim()) list.push(`${ing}${meas ? ` (${meas})` : ''}`)
-      }
-      return list
-    }
-  }
-}
+};
 </script>
 
 <style scoped>

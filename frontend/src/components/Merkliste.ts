@@ -1,18 +1,33 @@
+// src/lib/merkliste.ts
 import { ref } from 'vue';
-import type { Meal } from '@/lib/backend';
+
+type MinimalMeal = {
+  idMeal: string;
+  name?: string;
+  strMeal?: string;
+  thumbUrl?: string;
+  strMealThumb?: string;
+};
 
 const KEY = 'wishlist-v1';
-const items = ref<Meal[]>(load());
+const items = ref<MinimalMeal[]>(load());
 
-function load(): Meal[] {
-  try { return JSON.parse(localStorage.getItem(KEY) || '[]'); } catch { return []; }
+function load(): MinimalMeal[] {
+  try { return JSON.parse(localStorage.getItem(KEY) || '[]'); }
+  catch { return []; }
 }
-function persist() { localStorage.setItem(KEY, JSON.stringify(items.value)); }
+function persist() {
+  localStorage.setItem(KEY, JSON.stringify(items.value));
+}
 
 export function useWishlist() {
-  function add(meal: Meal) {
+  function add(meal: MinimalMeal) {
     if (!items.value.some(m => m.idMeal === meal.idMeal)) {
-      items.value.push({ idMeal: meal.idMeal, name: meal.name ?? meal.strMeal, thumbUrl: meal.thumbUrl ?? meal.strMealThumb });
+      items.value.push({
+        idMeal: meal.idMeal,
+        name: meal.name ?? meal.strMeal,
+        thumbUrl: meal.thumbUrl ?? meal.strMealThumb
+      });
       persist();
     }
   }
@@ -26,5 +41,4 @@ export function useWishlist() {
   return { items, add, remove, clear, has };
 }
 
-export default class Merkliste {
-}
+export default class Merkliste {}
