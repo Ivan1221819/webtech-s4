@@ -1,17 +1,9 @@
 <script setup lang="ts"></script>
 
 <template>
-  <Startseite />
+  <router-view />
 </template>
 
-<script>
-import Startseite from './components/Startseite.vue'
-import Merkliste from './components/Merkliste.ts';
-
-export default {
-  name: 'App',
-  components: { Startseite, Merkliste }
-}
-</script>
+<script setup lang="ts"></script>
 
 <style scoped></style>
