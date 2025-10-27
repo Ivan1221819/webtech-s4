@@ -7,7 +7,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/meals")
-@CrossOrigin(origins = "http://localhost:5173") // für Vite
+@CrossOrigin(origins = {"http://localhost:5173", "https://webtech-s4.onrender.com"}) // für Vite
 public class MealController {
 
     private final MealDBClient client;
