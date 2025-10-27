@@ -1,11 +1,17 @@
 <script setup lang="ts"></script>
 
 <template>
-  <h1>You did it!</h1>
-  <p>
-    Visit <a href="https://vuejs.org/" target="_blank" rel="noopener">vuejs.org</a> to read the
-    documentation
-  </p>
+  <Startseite />
 </template>
+
+<script>
+import Startseite from './components/Startseite.vue'
+import Merkliste from './components/Merkliste.ts';
+
+export default {
+  name: 'App',
+  components: { Startseite, Merkliste }
+}
+</script>
 
 <style scoped></style>

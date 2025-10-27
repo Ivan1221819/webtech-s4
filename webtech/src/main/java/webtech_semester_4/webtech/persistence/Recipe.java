@@ -1,37 +1,22 @@
 package webtech_semester_4.webtech.persistence;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Column;
 
-
-@Entity
 public class Recipe {
 
-    public Recipe(String title, String description, String image_Url) {
+    public Recipe(String title, String description, String imageUrl) {
         this.title = title;
         this.description = description;
-        this.image_Url = image_Url;
+        this.imageUrl = imageUrl;
     }
 
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
     private Long id;
 
-    @Column(name = "title", nullable = false)
     private String title;
 
-    @Column(name = "description")
     private String description;
 
-    @Column(name = "image_URL")
-    private String image_Url;
-
-
+    private String imageUrl;
 
 
 
@@ -44,6 +29,6 @@ public class Recipe {
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
 
-    public String getImage_Url() { return image_Url; }
-    public void setImage_Url(String image_Url) { this.image_Url = image_Url; }
+    public String getImageUrl() { return imageUrl; }
+    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
 }
