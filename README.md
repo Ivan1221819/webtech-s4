@@ -18,3 +18,10 @@ Die Plattform bietet eine große Auswahl an Gerichten mit klaren Anleitungen und
 🥕 Mit Bildern: Jedes Rezept zeigt das fertige Gericht und die benötigten Zutaten.
 
 📖 Einfache Anleitung: Schritt-für-Schritt erklärt – auch für unerfahrene Kochanfänger verständlich.
+
+
+
+
+Datenbank / API:
+
+- Rezept-Datenbank: https://www.themealdb.com/

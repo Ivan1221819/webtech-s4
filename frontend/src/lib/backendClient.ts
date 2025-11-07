@@ -1,27 +1,29 @@
-const BASE = import.meta.env.VITE_API_BASE ?? 'http://localhost:8080';
+const RAW = (import.meta.env as any).VITE_API_BASE as string | undefined;
+export const BASE = (RAW && /^https?:\/\//i.test(RAW) ? RAW : 'http://localhost:8080').replace(/\/+$/, '');
 
-// Suche: /api/meals?q=
-export async function searchMeals(q: string) {
-  const res = await fetch(`${BASE}/api/meals?q=${encodeURIComponent(q ?? '')}`);
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  return res.json() as Promise<{ meals: Meal[] | null }>;
-}
-
-// Detail: /api/meals/{id}  (liefert ebenfalls { meals: [...] } mit genau 1 Meal)
-export async function getMealById(id: string) {
-  const res = await fetch(`${BASE}/api/meals/${encodeURIComponent(id)}`);
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  return res.json() as Promise<{ meals: Meal[] | null }>;
-}
-
-// Minimaler Typ (passt auf beide Endpunkte)
-export type Meal = {
+export type RawMeal = {
   idMeal: string;
-  name?: string;           // vom Backend normalisiert (optional)
-  thumbUrl?: string;       // dito
-  strMeal?: string;        // original TheMealDB-Feld
-  strMealThumb?: string;   // original
-  strInstructions?: string;
-  // Zutaten/Measures kommen im Detail als strIngredient1..20 / strMeasure1..20
-  [k: string]: any;
+  strMeal?: string; strMealThumb?: string; strInstructions?: string;
+  name?: string; thumbUrl?: string; instructions?: string;
+  [k: `strIngredient${number}`]: string | undefined;
+  [k: `strMeasure${number}`]: string | undefined;
 };
+export type MealsResponse = { meals: RawMeal[] | null };
+
+function url(path: string, params?: Record<string,string|undefined>) {
+  const u = new URL(BASE + path);
+  if (params) for (const [k,v] of Object.entries(params)) if (v) u.searchParams.set(k, v);
+  return u.toString();
+}
+
+export async function searchMeals(q: string): Promise<MealsResponse> {
+  const res = await fetch(url('/api/meals', { q }));
+  if (!res.ok) throw new Error(`HTTP ${res.status} for ${res.url}`);
+  return res.json();
+}
+export async function getMealById(id: string): Promise<MealsResponse> {
+  const res = await fetch(url(`/api/meals/${encodeURIComponent(id)}`));
+  if (!res.ok) throw new Error(`HTTP ${res.status} for ${res.url}`);
+  return res.json();
+}
+

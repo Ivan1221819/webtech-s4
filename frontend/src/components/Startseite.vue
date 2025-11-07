@@ -3,7 +3,7 @@
     <!-- Header -->
     <header class="header">
       <button @click="toggleDarkMode" class="mode-toggle">
-        {{ darkMode ? '🌞 Light' : '🌙 Dark' }}
+        {{ darkMode ? ' Light' : ' Dark' }}
       </button>
 
       <h1 class="logo">🍴 Food Book</h1>
@@ -13,7 +13,7 @@
       </button>
     </header>
 
-    <!-- Suchleiste -->
+    <!--Suchleiste-->
     <div class="search-wrap">
       <div class="search">
         <span class="icon">🔍</span>
@@ -21,23 +21,23 @@
           ref="searchInput"
           type="text"
           v-model="query"
-          placeholder="Rezept suchen (z. B. Spaghetti, Chicken, Curry)"
+          placeholder="Rezept suchen (z. B. Soup, Muffin, Spaghetti, ...)"
           @input="onQueryInput"
           @keyup.enter="runSearch"
           aria-label="Rezeptsuche"
         />
         <button v-if="query" class="clear" @click="clearSearch" aria-label="Eingabe löschen">✕</button>
       </div>
-      <small class="hint">ab 2 Zeichen wird gesucht · Enter zum Auslösen</small>
+      <small class="hint">Mindestens ein Begriff (auf Englisch !!) · Drücke Enter zum Suchen</small>
     </div>
 
-    <!-- Status / Fehler -->
+    <!--Error-->
     <div v-if="error" class="msg err">{{ error }}</div>
     <div v-else-if="loading" class="msg">Lade…</div>
 
-    <!-- Merkliste -->
+    <!--Merkliste-->
     <section v-if="showMerkliste" class="list-section">
-      <h2>📌 Gemerkte Rezepte</h2>
+      <h2>📌 Gespeicherte Rezepte</h2>
       <div v-if="savedMeals.length" class="grid">
         <article v-for="m in savedMeals" :key="m.idMeal" class="card" @click="openMeal(m)">
           <img :src="m.strMealThumb" :alt="m.strMeal" />
@@ -47,10 +47,10 @@
           </div>
         </article>
       </div>
-      <div v-else class="msg muted">Noch nichts gemerkt.</div>
+      <div v-else class="msg muted">Noch nichts gespeichert.</div>
     </section>
 
-    <!-- Suchergebnisse -->
+    <!--Suchergebnisse-->
     <section v-else class="grid">
       <article v-for="m in results" :key="m.idMeal" class="card" @click="openMeal(m)">
         <img :src="m.strMealThumb" :alt="m.strMeal" />
@@ -61,15 +61,10 @@
       </div>
     </section>
 
-    <!-- Detailmodal -->
+    <!--Rezept_Menü-->
     <div v-if="selectedMeal" class="modal" @click.self="selectedMeal = null">
       <div class="modal-content">
-        <img
-          v-if="selectedMeal.strMealThumb"
-          :src="selectedMeal.strMealThumb"
-          :alt="selectedMeal.strMeal"
-          class="modal-poster"
-        />
+        <img v-if="selectedMeal.strMealThumb" :src="selectedMeal.strMealThumb" :alt="selectedMeal.strMeal" class="modal-poster" />
         <div class="modal-info">
           <button class="back" @click="selectedMeal = null">← Zur Suche</button>
           <h2>{{ selectedMeal.strMeal }}</h2>
@@ -92,72 +87,54 @@
   </div>
 </template>
 
-<script lang="ts">
-import { useWishlist } from '@/lib/merkliste';
-
-const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:8080';
+<script>
+import { searchMeals, getMealById } from '@/lib/backendClient';
+import { useWishlist } from '@/lib/Merkliste';
 
 export default {
   name: 'RecipeSearch',
-
-  // Wishlist-Composable in Options-API verwenden
-  setup() {
-    const { items, add, remove, clear, has } = useWishlist();
-    return {
-      wishlist: items,           // Ref-Liste aus der Composable
-      addToWishlist: add,
-      removeFromWishlist: remove,
-      clearWishlist: clear,
-      hasInWishlist: has,
-    };
-  },
-
   data() {
     return {
       query: '',
-      results: [] as any[],
+      results: [],
       loading: false,
       error: '',
-      selectedMeal: null as any,
+      selectedMeal: null,
       showMerkliste: false,
       darkMode: true,
-      _debounceTimer: null as any,
-    };
-  },
+      _debounceTimer: null,
 
+
+      wishlist: useWishlist(),
+    }
+  },
   computed: {
-    // Anzeige-Adapter: Wishlist-Items -> TheMealDB-Felder im Template
-    savedMeals(): any[] {
-      return this.wishlist.map((m: any) => ({
+    savedMeals() {
+      return this.wishlist.items.map(m => ({
         idMeal: m.idMeal,
-        strMeal: m.name,
-        strMealThumb: m.thumbUrl,
+        strMeal: m.strMeal ?? m.name ?? '',
+        strMealThumb: m.strMealThumb ?? m.thumbUrl ?? ''
       }));
     },
-    ingredients(): string[] {
+    ingredients() {
       if (!this.selectedMeal) return [];
-      const m = this.selectedMeal as any;
-      const list: string[] = [];
+      const m = this.selectedMeal;
+      const list = [];
       for (let i = 1; i <= 20; i++) {
         const ing = m[`strIngredient${i}`];
         const meas = m[`strMeasure${i}`];
         if (ing && ing.trim()) list.push(`${ing}${meas ? ` (${meas})` : ''}`);
       }
       return list;
-    },
+    }
   },
-
   methods: {
-    /* ---- UI ---- */
-    toggleDarkMode() { this.darkMode = !this.darkMode; },
-    toggleMerkliste() { this.showMerkliste = !this.showMerkliste; },
-    clearSearch() {
-      this.query = '';
-      this.results = [];
-      (this.$refs as any).searchInput?.focus();
-    },
+    /* ----User Interface---- */
+    toggleDarkMode() { this.darkMode = !this.darkMode },
+    toggleMerkliste() { this.showMerkliste = !this.showMerkliste },
+    clearSearch() { this.query = ''; this.results = []; this.$refs.searchInput?.focus() },
 
-    /* ---- Suche (mit Debounce) ---- */
+    /* ---- Suche (mit Verzögerung) ---- */
     onQueryInput() {
       clearTimeout(this._debounceTimer);
       if (this.query.trim().length < 2) { this.results = []; return; }
@@ -168,10 +145,8 @@ export default {
       if (q.length < 2) return;
       this.loading = true; this.error = ''; this.showMerkliste = false;
       try {
-        const res = await fetch(`${API_BASE}/api/meals?q=${encodeURIComponent(q)}`);
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json();
-        this.results = data.meals ?? []; // TheMealDB gibt null bei 0 Treffern
+        const data = await searchMeals(q);
+        this.results = data.meals ?? [];
       } catch (e) {
         this.error = 'Suche fehlgeschlagen';
         this.results = [];
@@ -181,12 +156,11 @@ export default {
       }
     },
 
-    /* ---- Detail laden/öffnen ---- */
-    async openMeal(meal: any) {
+    /* ---- Rezept laden/öffnen ---- */
+    async openMeal(meal) {
       try {
         if (!meal.strInstructions) {
-          const res = await fetch(`${API_BASE}/api/meals/${meal.idMeal}`);
-          const data = await res.json();
+          const data = await getMealById(meal.idMeal);
           this.selectedMeal = (data.meals && data.meals[0]) || meal;
         } else {
           this.selectedMeal = meal;
@@ -197,25 +171,22 @@ export default {
       }
     },
 
-    /* ---- Merkliste via Composable ---- */
-    isSaved(id: string) { return this.hasInWishlist(id); },
-    addToList(meal: any) {
-      this.addToWishlist({
-        idMeal: meal.idMeal,
-        strMeal: meal.strMeal,
-        strMealThumb: meal.strMealThumb,
-      });
+    /* ---- Merkliste via useWishlist ---- */
+    isSaved(id) { return this.wishlist.has(id); },
+    addToList(meal) {
+      this.wishlist.add(meal);
       alert('Rezept gemerkt.');
     },
-    removeFromList(id: string) {
-      this.removeFromWishlist(id);
+    removeFromList(id) {
+      this.wishlist.remove(id);
     },
-  },
-};
+  }
+}
 </script>
 
+
 <style scoped>
-/* Layout / Farben */
+/* Layout - Farben */
 .recipe-search { min-height: 100vh; background: #0f0f0f; color: #f5f5f5; }
 .light { background: #f6f6f6; color: #111; }
 
@@ -229,7 +200,7 @@ export default {
 .mode-toggle { justify-self: start; }
 .wishlist-btn { justify-self: end; }
 
-/* Buttons */
+/* Knöpfe */
 .mode-toggle, .wishlist-btn {
   padding: .45rem .9rem; border-radius: 999px; border: 1px solid #2b2b2b;
   background: #171717; color: #fff; cursor: pointer;
@@ -271,12 +242,12 @@ export default {
 }
 .remove:hover { background:#232323; }
 
-/* Messages */
+/* Nachrichten */
 .msg { text-align:center; margin: 14px 0; }
 .err { color:#ff6161; }
 .muted { color:#9a9a9a; }
 
-/* Modal */
+/* Model */
 .modal { position: fixed; inset:0; background: rgba(0,0,0,.85); display:flex; align-items:center; justify-content:center; z-index:99; padding:18px; }
 .modal-content { background:#171717; border:1px solid #242424; border-radius: 14px; max-width: 980px; width:100%;
   display:grid; grid-template-columns: 360px 1fr; gap:16px; padding:18px; color:#eee; }
