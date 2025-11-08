@@ -4,7 +4,6 @@ export const BASE = (RAW && /^https?:\/\//i.test(RAW) ? RAW : 'http://localhost:
 export type RawMeal = {
   idMeal: string;
   strMeal?: string; strMealThumb?: string; strInstructions?: string;
-  name?: string; thumbUrl?: string; instructions?: string;
   [k: `strIngredient${number}`]: string | undefined;
   [k: `strMeasure${number}`]: string | undefined;
 };
@@ -18,11 +17,6 @@ function url(path: string, params?: Record<string,string|undefined>) {
 
 export async function searchMeals(q: string): Promise<MealsResponse> {
   const res = await fetch(url('/api/meals', { q }));
-  if (!res.ok) throw new Error(`HTTP ${res.status} for ${res.url}`);
-  return res.json();
-}
-export async function getMealById(id: string): Promise<MealsResponse> {
-  const res = await fetch(url(`/api/meals/${encodeURIComponent(id)}`));
   if (!res.ok) throw new Error(`HTTP ${res.status} for ${res.url}`);
   return res.json();
 }

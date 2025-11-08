@@ -21,17 +21,10 @@ public class TheMealDbClient {
         return get(url);
     }
 
-    public Map<?, ?> lookupById(String id) {
-        String url = UriComponentsBuilder.fromHttpUrl(BASE + "/lookup.php")
-                .queryParam("i", id)
-                .toUriString();
-        return get(url);
-    }
-
     private Map<?, ?> get(String url) {
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
         ResponseEntity<Map> resp = http.exchange(url, HttpMethod.GET, new HttpEntity<>(headers), Map.class);
-        return resp.getBody(); // {meals:[...]} oder {meals:null}
+        return resp.getBody();
     }
 }

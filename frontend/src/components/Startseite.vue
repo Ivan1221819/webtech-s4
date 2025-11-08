@@ -88,7 +88,7 @@
 </template>
 
 <script>
-import { searchMeals, getMealById } from '@/lib/backendClient';
+import { searchMeals } from '@/lib/backendClient';
 import { useWishlist } from '@/lib/Merkliste';
 
 export default {
@@ -110,11 +110,7 @@ export default {
   },
   computed: {
     savedMeals() {
-      return this.wishlist.items.map(m => ({
-        idMeal: m.idMeal,
-        strMeal: m.strMeal ?? m.name ?? '',
-        strMealThumb: m.strMealThumb ?? m.thumbUrl ?? ''
-      }));
+      return this.wishlist.items;
     },
     ingredients() {
       if (!this.selectedMeal) return [];
@@ -157,19 +153,10 @@ export default {
     },
 
     /* ---- Rezept laden/öffnen ---- */
-    async openMeal(meal) {
-      try {
-        if (!meal.strInstructions) {
-          const data = await getMealById(meal.idMeal);
-          this.selectedMeal = (data.meals && data.meals[0]) || meal;
-        } else {
-          this.selectedMeal = meal;
-        }
-      } catch (e) {
-        console.error(e);
-        this.selectedMeal = meal;
-      }
+    openMeal(meal) {
+      this.selectedMeal = meal;
     },
+
 
     /* ---- Merkliste via useWishlist ---- */
     isSaved(id) { return this.wishlist.has(id); },

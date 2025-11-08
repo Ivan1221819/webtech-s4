@@ -1,6 +1,6 @@
 
 import { ref } from 'vue';
-import type { Meal } from '@/lib/backendClient';
+import type { RawMeal as Meal } from '@/lib/backendClient';
 
 const KEY = 'wishlist-v1';
 const items = ref<Meal[]>(load());
@@ -21,8 +21,8 @@ export function useWishlist() {
     if (!items.value.some(m => m.idMeal === meal.idMeal)) {
       items.value.push({
         idMeal: meal.idMeal,
-        name: meal.name ?? meal.strMeal,
-        thumbUrl: meal.thumbUrl ?? meal.strMealThumb
+        strMeal: meal.strMeal,
+        strMealThumb: meal.strMealThumb
       });
       persist();
     }
