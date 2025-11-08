@@ -8,7 +8,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = {"http://localhost:5173", "https://webtech-s4.onrender.com"})
+@CrossOrigin(origins = {"http://localhost:5173", "https://webtech-s4-1.onrender.com"})
 public class MealsController {
 
     private final TheMealDbClient client;
