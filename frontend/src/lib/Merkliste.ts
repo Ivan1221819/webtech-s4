@@ -19,25 +19,42 @@ function persist() {
 export function useWishlist() {
   function add(meal: Meal) {
     if (!items.value.some(m => m.idMeal === meal.idMeal)) {
-      items.value.push({
+
+      // Name, Bild, Beschreibung
+      const newMeal: Meal = {
         idMeal: meal.idMeal,
         strMeal: meal.strMeal,
-        strMealThumb: meal.strMealThumb
-      });
+        strMealThumb: meal.strMealThumb,
+        strInstructions: meal.strInstructions,
+      };
+
+      // Zutaten
+      const extras: any = {};
+      for (let i = 1; i <= 20; i++) {
+        const ing = meal[`strIngredient${i}`];
+        const mea = meal[`strMeasure${i}`];
+        if (ing) extras[`strIngredient${i}`] = ing;
+        if (mea) extras[`strMeasure${i}`] = mea;
+      }
+
+      // Name, Bild, Beschreibung + Zutaten
+      Object.assign(newMeal, extras);
+
+      items.value.push(newMeal);
       persist();
     }
   }
+
+  // Löscht gespeicherte Rezepte
   function remove(idMeal: string) {
     items.value = items.value.filter(m => m.idMeal !== idMeal);
     persist();
   }
-  function clear() {
-    items.value = [];
-    persist();
-  }
+
+
   function has(idMeal: string) {
     return items.value.some(m => m.idMeal === idMeal);
   }
 
-  return { items, add, remove, clear, has };
+  return { items, add, remove, has };
 }
