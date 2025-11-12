@@ -132,10 +132,17 @@ export default {
 
     /* ---- Suche (mit Verzögerung) ---- */
     onQueryInput() {
+      if (this.query.trim().length < 1) {
+        this.results = [];
+        this.error = '';
+        this.loading = false;
+        return;
+      }
       clearTimeout(this._debounceTimer);
       if (this.query.trim().length < 2) { this.results = []; return; }
       this._debounceTimer = setTimeout(this.runSearch, 250);
     },
+
     async runSearch() {
       const q = this.query.trim();
       if (q.length < 2) return;
