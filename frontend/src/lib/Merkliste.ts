@@ -1,60 +1,70 @@
-
 import { ref } from 'vue';
-import type { RawMeal as Meal } from '@/lib/backendClient';
+import { getMerkliste, addToMerkliste, removeFromMerkliste } from '@/lib/backendClient';
 
-const KEY = 'wishlist-v1';
-const items = ref<Meal[]>(load());
+export interface Meal {
+  idMeal: string;
+  strMeal: string;
+  strMealThumb: string;
+  strInstructions?: string;
+}
 
-function load(): Meal[] {
+
+const merkliste = ref<Meal[]>([]);
+const loading = ref(false);
+const error = ref<string | null>(null);
+let initialized = false;
+
+function mapFromBackend(item: any): Meal {
+  return {
+    idMeal: item.mealId,
+    strMeal: item.title,
+    strMealThumb: item.thumbnail,
+    strInstructions: item.instructions,
+  };
+}
+
+async function loadOnce() {
+  if (initialized) return;
+  initialized = true;
+
+  loading.value = true;
+  error.value = null;
+
   try {
-    return JSON.parse(localStorage.getItem(KEY) || '[]');
-  } catch {
-    return [];
+    const items = await getMerkliste();
+    merkliste.value = (items ?? []).map(mapFromBackend);
+  } catch (e: any) {
+    console.error(e);
+    error.value = e.message ?? 'Fehler beim Laden der Merkliste';
+  } finally {
+    loading.value = false;
   }
 }
-function persist() {
-  localStorage.setItem(KEY, JSON.stringify(items.value));
+
+function isInMerkliste(mealId: string) {
+  return merkliste.value.some(m => m.idMeal === mealId);
 }
 
-export function useWishlist() {
-  function add(meal: Meal) {
-    if (!items.value.some(m => m.idMeal === meal.idMeal)) {
+async function toggle(meal: Meal) {
+  await loadOnce();
 
-      // Name, Bild, Beschreibung
-      const newMeal: Meal = {
-        idMeal: meal.idMeal,
-        strMeal: meal.strMeal,
-        strMealThumb: meal.strMealThumb,
-        strInstructions: meal.strInstructions,
-      };
-
-      // Zutaten
-      const extras: any = {};
-      for (let i = 1; i <= 20; i++) {
-        const ing = meal[`strIngredient${i}`];
-        const mea = meal[`strMeasure${i}`];
-        if (ing) extras[`strIngredient${i}`] = ing;
-        if (mea) extras[`strMeasure${i}`] = mea;
-      }
-
-      // Name, Bild, Beschreibung + Zutaten
-      Object.assign(newMeal, extras);
-
-      items.value.push(newMeal);
-      persist();
-    }
+  if (isInMerkliste(meal.idMeal)) {
+    await removeFromMerkliste(meal.idMeal);
+    merkliste.value = merkliste.value.filter(m => m.idMeal !== meal.idMeal);
+  } else {
+    await addToMerkliste(meal);
+    merkliste.value.push(meal);
   }
+}
 
-  // Löscht gespeicherte Rezepte
-  function remove(idMeal: string) {
-    items.value = items.value.filter(m => m.idMeal !== idMeal);
-    persist();
-  }
+export function useMerkliste() {
+  void loadOnce();    // beim ersten Aufruf laden
 
-
-  function has(idMeal: string) {
-    return items.value.some(m => m.idMeal === idMeal);
-  }
-
-  return { items, add, remove, has };
+  return {
+    merkliste,
+    loading,
+    error,
+    toggle,
+    isInMerkliste,
+  };
 }

@@ -24,7 +24,7 @@ public class TheMealDbClient {
     private Map<?, ?> get(String url) {
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-        ResponseEntity<Map> resp = http.exchange(url , HttpMethod.GET, new HttpEntity<>(headers), Map.class);
+        ResponseEntity<Map> resp = http.exchange(url, HttpMethod.GET, new HttpEntity<>(headers), Map.class);
         return resp.getBody();
     }
 }

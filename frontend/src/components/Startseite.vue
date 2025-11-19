@@ -87,93 +87,132 @@
   </div>
 </template>
 
-<script>
+<script setup lang="ts">
+import { ref, computed } from 'vue';
 import { searchMeals } from '@/lib/backendClient';
-import { useWishlist } from '@/lib/Merkliste';
+import { useMerkliste } from '@/lib/Merkliste';
+import type { Meal } from '@/lib/Merkliste';
 
-export default {
-  name: 'RecipeSearch',
-  data() {
-    return {
-      query: '',
-      results: [],
-      loading: false,
-      error: '',
-      selectedMeal: null,
-      showMerkliste: false,
-      darkMode: true,
-      _debounceTimer: null,
+// Such-/UI-State
+const query = ref('');
+const results = ref<Meal[]>([]);
+const loading = ref(false);
+const error = ref('');
+const selectedMeal = ref<Meal | null>(null);
+const showMerkliste = ref(false);
+const darkMode = ref(true);
+const searchInput = ref<HTMLInputElement | null>(null);
+let _debounceTimer: number | null = null;
 
+// Merkliste aus Composable
+const { merkliste, toggle, isInMerkliste } = useMerkliste();
 
-      wishlist: useWishlist(),
+// abgeleitete Werte
+const savedMeals = computed(() => merkliste.value ?? []);
+
+const ingredients = computed(() => {
+  if (!selectedMeal.value) return [];
+  const m: any = selectedMeal.value;
+  const list: string[] = [];
+  for (let i = 1; i <= 20; i++) {
+    const ing = m[`strIngredient${i}`];
+    const meas = m[`strMeasure${i}`];
+    if (ing && ing.trim()) list.push(`${ing}${meas ? ` (${meas})` : ''}`);
+  }
+  return list;
+});
+
+/* ---- UI ---- */
+function toggleDarkMode() {
+  darkMode.value = !darkMode.value;
+}
+
+function toggleMerkliste() {
+  showMerkliste.value = !showMerkliste.value;
+}
+
+function clearSearch() {
+  query.value = '';
+  results.value = [];
+  error.value = '';
+  loading.value = false;
+  if (searchInput.value) {
+    searchInput.value.focus();
+  }
+}
+
+/* ---- Suche (mit Debounce) ---- */
+function onQueryInput() {
+  const q = query.value.trim();
+
+  if (q.length < 1) {
+    results.value = [];
+    error.value = '';
+    loading.value = false;
+    return;
+  }
+
+  if (_debounceTimer !== null) {
+    clearTimeout(_debounceTimer);
+  }
+
+  if (q.length < 2) {
+    results.value = [];
+    return;
+  }
+
+  _debounceTimer = window.setTimeout(runSearch, 250);
+}
+
+async function runSearch() {
+  const q = query.value.trim();
+  if (q.length < 2) return;
+
+  loading.value = true;
+  error.value = '';
+  showMerkliste.value = false;
+
+  try {
+    const data = await searchMeals(q);
+    results.value = data.meals ?? [];
+  } catch (e) {
+    console.error(e);
+    error.value = 'Suche fehlgeschlagen';
+    results.value = [];
+  } finally {
+    loading.value = false;
+  }
+}
+
+/* ---- Rezept öffnen ---- */
+function openMeal(meal: Meal) {
+  selectedMeal.value = meal;
+}
+
+/* ---- Merkliste ---- */
+function isSaved(id: string) {
+  return isInMerkliste(id);
+}
+
+async function addToList(meal: Meal) {
+  try {
+    await toggle(meal);
+    alert('Rezept gemerkt.');
+  } catch (e) {
+    console.error('Fehler beim Speichern in die Merkliste', e);
+    alert('Fehler beim Speichern.');
+  }
+}
+
+async function removeFromList(id: string) {
+  try {
+    const meal = merkliste.value.find(m => m.idMeal === id);
+    if (meal) {
+      await toggle(meal);
     }
-  },
-  computed: {
-    savedMeals() {
-      return this.wishlist.items;
-    },
-    ingredients() {
-      if (!this.selectedMeal) return [];
-      const m = this.selectedMeal;
-      const list = [];
-      for (let i = 1; i <= 20; i++) {
-        const ing = m[`strIngredient${i}`];
-        const meas = m[`strMeasure${i}`];
-        if (ing && ing.trim()) list.push(`${ing}${meas ? ` (${meas})` : ''}`);
-      }
-      return list;
-    }
-  },
-  methods: {
-    /* ----User Interface---- */
-    toggleDarkMode() { this.darkMode = !this.darkMode },
-    toggleMerkliste() { this.showMerkliste = !this.showMerkliste },
-    clearSearch() { this.query = ''; this.results = []; this.$refs.searchInput?.focus() },
-
-    /* ---- Suche (mit Verzögerung) ---- */
-    onQueryInput() {
-      if (this.query.trim().length < 1) {
-        this.results = [];
-        this.error = '';
-        this.loading = false;
-        return;
-      }
-      clearTimeout(this._debounceTimer);
-      if (this.query.trim().length < 2) { this.results = []; return; }
-      this._debounceTimer = setTimeout(this.runSearch, 250);
-    },
-
-    async runSearch() {
-      const q = this.query.trim();
-      if (q.length < 2) return;
-      this.loading = true; this.error = ''; this.showMerkliste = false;
-      try {
-        const data = await searchMeals(q);
-        this.results = data.meals ?? [];
-      } catch (e) {
-        this.error = 'Suche fehlgeschlagen';
-        this.results = [];
-        console.error(e);
-      } finally {
-        this.loading = false;
-      }
-    },
-
-    /* ---- Rezept laden/öffnen ---- */
-    openMeal(meal) {
-      this.selectedMeal = meal;
-    },
-
-
-    /* ---- Merkliste via useWishlist ---- */
-    isSaved(id) { return this.wishlist.has(id); },
-    addToList(meal) {
-      this.wishlist.add(meal);
-      alert('Rezept gemerkt.');
-    },
-    removeFromList(id) {
-      this.wishlist.remove(id);
-    },
+  } catch (e) {
+    console.error('Fehler beim Entfernen aus der Merkliste', e);
+    alert('Fehler beim Entfernen.');
   }
 }
 </script>
