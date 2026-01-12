@@ -2,7 +2,7 @@ package webtech_semester_4.webtech.mealdbMerkliste;
 
 
 import org.springframework.stereotype.Service;
-import webtech_semester_4.webtech.MerklisteRepo.MerklisteRepository;
+import webtech_semester_4.webtech.Repository.MerklisteRepository;
 
 import java.util.List;
 

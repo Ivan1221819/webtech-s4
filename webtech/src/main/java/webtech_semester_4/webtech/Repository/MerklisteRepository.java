@@ -1,4 +1,4 @@
-package webtech_semester_4.webtech.MerklisteRepo;
+package webtech_semester_4.webtech.Repository;
 
 
 import jakarta.transaction.Transactional;

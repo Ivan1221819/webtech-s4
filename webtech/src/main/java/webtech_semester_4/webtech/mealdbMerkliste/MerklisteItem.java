@@ -26,7 +26,13 @@ public class MerklisteItem {
 
     public MerklisteItem() {}
 
-
+    public MerklisteItem(String mealId, String title, String thumbnail, String instructions, String ingredients) {
+        this.mealId = mealId;
+        this.title = title;
+        this.thumbnail = thumbnail;
+        this.instructions = instructions;
+        this.ingredients = ingredients;
+    }
 
 
     public String getMealId() {
