@@ -4,6 +4,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+@CrossOrigin(origins = {"http://localhost:5173", "https://webtech-s4-1.onrender.com"})
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {

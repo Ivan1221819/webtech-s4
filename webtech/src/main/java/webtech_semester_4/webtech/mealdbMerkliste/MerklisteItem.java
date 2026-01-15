@@ -24,7 +24,8 @@ public class MerklisteItem {
 
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    public MerklisteItem() {}
+    public MerklisteItem() {
+    }
 
     public MerklisteItem(String mealId, String title, String thumbnail, String instructions, String ingredients) {
         this.mealId = mealId;
@@ -38,6 +39,7 @@ public class MerklisteItem {
     public String getMealId() {
         return mealId;
     }
+
     public void setMealId(String mealId) {
         this.mealId = mealId;
     }
@@ -45,6 +47,7 @@ public class MerklisteItem {
     public Long getId() {
         return id;
     }
+
     public void setId(Long id) {
         this.id = id;
     }
@@ -52,6 +55,7 @@ public class MerklisteItem {
     public String getTitle() {
         return title;
     }
+
     public void setTitle(String title) {
         this.title = title;
     }
@@ -59,6 +63,7 @@ public class MerklisteItem {
     public String getThumbnail() {
         return thumbnail;
     }
+
     public void setThumbnail(String thumbnail) {
         this.thumbnail = thumbnail;
     }
@@ -66,6 +71,7 @@ public class MerklisteItem {
     public String getInstructions() {
         return instructions;
     }
+
     public void setInstructions(String instructions) {
         this.instructions = instructions;
     }
@@ -73,6 +79,7 @@ public class MerklisteItem {
     public String getIngredients() {
         return ingredients;
     }
+
     public void setIngredients(String ingredients) {
         this.ingredients = ingredients;
     }
@@ -80,6 +87,7 @@ public class MerklisteItem {
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
+
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
