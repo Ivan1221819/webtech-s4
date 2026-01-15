@@ -28,7 +28,7 @@ public class AuthController {
 
         AppUser u = new AppUser();
         u.setEmail(req.email());
-        u.setPasswordHash(encoder.encode(req.password())); // <- HASH, nicht Klartext
+        u.setPasswordHash(encoder.encode(req.password())); // Hash passwort
         repo.save(u);
 
         return ResponseEntity.ok().build();
@@ -43,7 +43,6 @@ public class AuthController {
         if (!encoder.matches(req.password(), u.getPasswordHash()))
             return ResponseEntity.status(401).body("invalid credentials");
 
-        // Minimal-Demo: "token". In echt: JWT erstellen.
         String fakeToken = "demo-" + u.getId();
         return ResponseEntity.ok(new TokenRes(fakeToken));
     }

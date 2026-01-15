@@ -79,11 +79,13 @@ function setMode(m: Mode) {
   password2.value = ''
 }
 
+const BASE_URL = (import.meta.env.VITE_BACKEND_URL || '/api').replace(/\/+$/, '')
+
 async function apiLogin() {
-  const res = await fetch('http://localhost:8080/api/auth/login', {
+  const res = await fetch(`${BASE_URL}/auth/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email: email.value, password: password.value })
+    body: JSON.stringify({ email: email.value, password: password.value }),
   })
 
   if (!res.ok) {
@@ -98,13 +100,12 @@ async function apiLogin() {
 }
 
 async function apiRegister() {
-  const res = await fetch('http://localhost:8080/api/auth/register', {
+  const res = await fetch(`${BASE_URL}/auth/register`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email: email.value, password: password.value })
+    body: JSON.stringify({ email: email.value, password: password.value }),
   })
 
-  // Optional: Backend kann 409 liefern wenn User existiert
   if (!res.ok) {
     const msg = await res.text().catch(() => '')
     throw new Error(msg || 'Registrierung fehlgeschlagen')
@@ -117,10 +118,10 @@ async function apiRegister() {
     return
   }
 
-  // Falls Register kein Token liefert: direkt danach einloggen
   info.value = 'Account erstellt. Login...'
   await apiLogin()
 }
+
 
 async function onSubmit() {
   error.value = null

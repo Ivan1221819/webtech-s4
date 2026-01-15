@@ -102,9 +102,6 @@ class Test_Backend {
                 .andExpect(jsonPath("$.error").value("RuntimeException"));
     }
 
-    // ==========================================================
-    // AuthService Tests (kein DB Zugriff, alles Mock)
-    // ==========================================================
 
     // 5)
     @Test
@@ -127,9 +124,7 @@ class Test_Backend {
         assertNotEquals("secret123", saved.getPasswordHash());
     }
 
-    // ==========================================================
-    // Helpers
-    // ==========================================================
+    // Helper
 
     private static Map<String, Object> mealsBody(String id, String name) {
         Map<String, Object> meal = new HashMap<>();
